@@ -14,6 +14,9 @@ if [ "$#" -eq 0 ]; then
 elif [ $1 = "-init" ]; then
     trap 'abort' 0
     set -e
+
+    echo "Install ffmpeg"
+    sudo apt-get install ffmpeg libsm6 libxext6  -y
     
     echo "Clone SadTalker"
     rm -rf SadTalker 
