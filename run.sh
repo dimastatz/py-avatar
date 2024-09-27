@@ -10,7 +10,7 @@ if [ "$#" -eq 0 ]; then
     echo "No arguments provided. Usage: 
     1. '-init' to build clean local environment
     2. '-docker' to build and run docker container
-    3. '-test' to run linter, formatter and tests"
+    3. '-cli' run avatar creation"
 elif [ $1 = "-init" ]; then
     trap 'abort' 0
     set -e
@@ -21,17 +21,18 @@ elif [ $1 = "-init" ]; then
     cd SadTalker 
 
     echo "Conda Create"
+    conda install ffmpeg
     conda create -n sadtalker python=3.8
     conda init
     conda activate sadtalker
     pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113
-    conda install ffmpeg
     pip install -r requirements.txt
     pip install TTS
-    
-elif [ $1 = "-test" ]; then
+
+elif [ $1 = "-cli" ]; then
     trap 'abort' 0
     set -e
+    python inference.py --driven_audio ../resources/dima.wav --source_image ../resources/dima.jpeg --enhancer gfpgan 
     
 elif [ $1 = "-docker" ]; then
     echo "Building and running docker image"
