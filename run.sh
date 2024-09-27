@@ -8,31 +8,31 @@ abort()
 
 if [ "$#" -eq 0 ]; then
     echo "No arguments provided. Usage: 
-    1. '-local' to build local environment
+    1. '-init' to build clean local environment
     2. '-docker' to build and run docker container
     3. '-test' to run linter, formatter and tests"
-elif [ $1 = "-local" ]; then
+elif [ $1 = "-init" ]; then
     trap 'abort' 0
     set -e
-    echo "Running format, linter and tests"
-    rm -rf .venv
-    python3 -m venv .venv
-    source .venv/bin/activate
-    pip install --upgrade pip
-    pip install -r ./requirements.txt
+    
+    echo "Clone SadTalker"
+    rm -rf SadTalker 
+    git clone https://github.com/OpenTalker/SadTalker.git
+    cd SadTalker 
 
-    black whisperflow tests
-    pylint --fail-under=9.9 whisperflow tests
-    pytest --ignore=tests/benchmark --cov-fail-under=95 --cov whisperflow -v tests
+    echo "Conda Create"
+    conda create -n sadtalker python=3.8
+    conda init
+    conda activate sadtalker
+    pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113
+    conda install ffmpeg
+    pip install -r requirements.txt
+    pip install TTS
+    
 elif [ $1 = "-test" ]; then
     trap 'abort' 0
     set -e
     
-    echo "Running format, linter and tests"
-    source .venv/bin/activate
-    black whisperflow tests
-    pylint --fail-under=9.9 whisperflow tests
-    pytest --ignore=tests/benchmark --cov-fail-under=95 --cov --log-cli-level=INFO whisperflow -v tests
 elif [ $1 = "-docker" ]; then
     echo "Building and running docker image"
     docker stop whisperflow-container
@@ -43,7 +43,7 @@ elif [ $1 = "-docker" ]; then
     docker run --name whisperflow-container -p 8888:8888 -d whisperflow-image
 else
   echo "Wrong argument is provided. Usage:
-    1. '-local' to build local environment
+    1. '-init' to build clean local environment
     2. '-docker' to build and run docker container
     3. '-test' to run linter, formatter and tests"
 fi
