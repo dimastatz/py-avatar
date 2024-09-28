@@ -32,6 +32,9 @@ elif [ $1 = "-init" ]; then
     pip install -r requirements.txt
     pip install TTS
 
+    echo "Download models"
+    bash scripts/download_models.sh
+
 elif [ $1 = "-cli" ]; then
     trap 'abort' 0
     set -e
